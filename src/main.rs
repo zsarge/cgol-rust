@@ -1,3 +1,4 @@
+use std::{thread, time};
 use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -20,7 +21,7 @@ struct Board {
     height: i32,
     width: i32,
     squares: [[Square; 80]; 10],
-    nextSquares: [[Square; 80]; 10],
+    next_squares: [[Square; 80]; 10],
 }
 
 impl Board {
@@ -92,10 +93,10 @@ impl Board {
 
     fn set_next(&mut self, xx: i32, yy: i32, value: Square) {
         let (x, y) = self.wrap(xx, yy);
-        self.nextSquares[y][x] = value;
+        self.next_squares[y][x] = value;
     }
 
-    fn applyRules(&mut self, x: i32, y: i32) {
+    fn apply_rules(&mut self, x: i32, y: i32) {
         let n = self.get_number_of_neighbors(x, y);
 
         if self.get(x,y) == Square::Alive {
@@ -118,14 +119,14 @@ impl Board {
     fn tick(&mut self) {
         for y in 0..self.height {
             for x in 0..self.width {
-                self.applyRules(x, y);
+                self.apply_rules(x, y);
             }
         }
         
         for yy in 0..self.height {
             for xx in 0..self.width {
                 let (x, y) = self.wrap(xx, yy);
-                self.squares[y][x] = self.nextSquares[y][x];
+                self.squares[y][x] = self.next_squares[y][x];
             }
         }
     }
@@ -136,7 +137,7 @@ fn main() {
         width: 80,
         height: 10,
         squares: [[Square::Dead; 80]; 10],
-        nextSquares: [[Square::Dead; 80]; 10],
+        next_squares: [[Square::Dead; 80]; 10],
     };
     b.set(5, 5, Square::Alive);
     b.set(6, 6, Square::Alive);
@@ -145,6 +146,10 @@ fn main() {
     b.set(4, 7, Square::Alive);
 
     b.show();
-    b.tick();
-    b.show();
+
+    loop {
+        b.tick();
+        thread::sleep(time::Duration::from_millis(100));
+        b.show();
+    }
 }
