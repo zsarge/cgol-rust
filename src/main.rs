@@ -20,6 +20,7 @@ struct Board {
     height: i32,
     width: i32,
     squares: [[Square; 80]; 10],
+    nextSquares: [[Square; 80]; 10],
 }
 
 impl Board {
@@ -88,6 +89,46 @@ impl Board {
         }
         n
     }
+
+    fn set_next(&mut self, xx: i32, yy: i32, value: Square) {
+        let (x, y) = self.wrap(xx, yy);
+        self.nextSquares[y][x] = value;
+    }
+
+    fn applyRules(&mut self, x: i32, y: i32) {
+        let n = self.get_number_of_neighbors(x, y);
+
+        if self.get(x,y) == Square::Alive {
+            if n < 2 {
+                self.set_next(x, y, Square::Dead);
+            } else if n > 3 {
+                self.set_next(x, y, Square::Dead);
+            } else {
+                self.set_next(x, y, Square::Alive);
+            }
+        } else {
+            if n == 3 {
+                self.set_next(x, y, Square::Alive);
+            } else {
+                self.set_next(x, y, Square::Dead);
+            }
+        }
+    }
+
+    fn tick(&mut self) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+                self.applyRules(x, y);
+            }
+        }
+        
+        for yy in 0..self.height {
+            for xx in 0..self.width {
+                let (x, y) = self.wrap(xx, yy);
+                self.squares[y][x] = self.nextSquares[y][x];
+            }
+        }
+    }
 }
 
 fn main() {
@@ -95,13 +136,15 @@ fn main() {
         width: 80,
         height: 10,
         squares: [[Square::Dead; 80]; 10],
+        nextSquares: [[Square::Dead; 80]; 10],
     };
     b.set(5, 5, Square::Alive);
     b.set(6, 6, Square::Alive);
     b.set(6, 7, Square::Alive);
     b.set(5, 7, Square::Alive);
     b.set(4, 7, Square::Alive);
+
     b.show();
-    println!("{}", b.get(5, 5));
-    println!("{}", b.get_number_of_neighbors(4, 4));
+    b.tick();
+    b.show();
 }
