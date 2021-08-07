@@ -1,5 +1,6 @@
-use std::{thread, time};
 use std::fmt;
+use std::time::Instant;
+use std::{thread, time};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 enum Square {
@@ -99,7 +100,7 @@ impl Board {
     fn apply_rules(&mut self, x: i32, y: i32) {
         let n = self.get_number_of_neighbors(x, y);
 
-        if self.get(x,y) == Square::Alive {
+        if self.get(x, y) == Square::Alive {
             if n < 2 {
                 self.set_next(x, y, Square::Dead);
             } else if n > 3 {
@@ -122,7 +123,7 @@ impl Board {
                 self.apply_rules(x, y);
             }
         }
-        
+
         for yy in 0..self.height {
             for xx in 0..self.width {
                 let (x, y) = self.wrap(xx, yy);
@@ -148,7 +149,10 @@ fn main() {
     b.show();
 
     loop {
+           let now = Instant::now();
         b.tick();
+        // let end = time::now();
+        println!("frame generated in {} us", now.elapsed().as_micros());
         thread::sleep(time::Duration::from_millis(100));
         b.show();
     }
