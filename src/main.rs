@@ -97,6 +97,10 @@ fn main() {
         squares: [[Square::Dead; 80]; 10],
     };
     b.set(5, 5, Square::Alive);
+    b.set(6, 6, Square::Alive);
+    b.set(6, 7, Square::Alive);
+    b.set(5, 7, Square::Alive);
+    b.set(4, 7, Square::Alive);
     b.show();
     println!("{}", b.get(5, 5));
     println!("{}", b.get_number_of_neighbors(4, 4));
