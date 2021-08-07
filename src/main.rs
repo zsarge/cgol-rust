@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 enum Square {
     Dead,
     Alive,
@@ -44,31 +44,51 @@ impl Board {
     }
 
     fn wrap(&self, mut x: i32, mut y: i32) -> (usize, usize) {
-	if y < 0 {
-	    y = self.height + y;
-	}
-	if x < 0 {
-	    x = self.width + x;
-	}
-	if y >= self.height {
-	    y = self.height - y;
-	}
-	if x >= self.width {
-	    x = self.width - x;
-	}
-	(x as usize, y as usize)
+        if y < 0 {
+            y = self.height + y;
+        }
+        if x < 0 {
+            x = self.width + x;
+        }
+        if y >= self.height {
+            y = self.height - y;
+        }
+        if x >= self.width {
+            x = self.width - x;
+        }
+        (x as usize, y as usize)
     }
 
     fn set(&mut self, x: usize, y: usize, value: Square) {
         self.squares[y][x] = value;
     }
 
-    fn get(mut self, x: i32, y: i32) -> Square {
-        let (xx, yy) = self.wrap(x,y);
+    fn get(&self, x: i32, y: i32) -> Square {
+        let (xx, yy) = self.wrap(x, y);
         self.squares[yy][xx]
     }
-}
 
+    fn get_number_of_neighbors(&self, x: i32, y: i32) -> i32 {
+        let mut n = 0;
+        // dx and dy are deltas from the given (x, y) point,
+        // Here is a graph:
+        /*
+          (x-1, y-1) | (x, y-1) | (x+1, y-1)
+          (x-1, y  ) | (x, y  ) | (x+1, y  )
+          (x-1, y+1) | (x, y+1) | (x+1, y+1)
+        */
+        for dx in -1..=1 {
+            for dy in -1..=1 {
+                if x + dx != x || y + dy != y {
+                    if self.get(x + dx, y + dy) == Square::Alive {
+                        n += 1;
+                    }
+                }
+            }
+        }
+        n
+    }
+}
 
 fn main() {
     let mut b = Board {
@@ -76,7 +96,8 @@ fn main() {
         height: 10,
         squares: [[Square::Dead; 80]; 10],
     };
-    b.set(5,5, Square::Alive);
+    b.set(5, 5, Square::Alive);
     b.show();
-    println!("{}", b.get(5,5));
+    println!("{}", b.get(5, 5));
+    println!("{}", b.get_number_of_neighbors(4, 4));
 }
