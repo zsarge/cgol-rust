@@ -76,10 +76,10 @@ impl Board {
         // dx and dy are deltas from the given (x, y) point,
         // Here is a graph:
         /*
-          (x-1, y-1) | (x, y-1) | (x+1, y-1)
-          (x-1, y  ) | (x, y  ) | (x+1, y  )
-          (x-1, y+1) | (x, y+1) | (x+1, y+1)
-        */
+         * (x-1, y-1) | (x, y-1) | (x+1, y-1)
+         * (x-1, y  ) | (x, y  ) | (x+1, y  )
+         * (x-1, y+1) | (x, y+1) | (x+1, y+1)
+         */
         for dx in -1..=1 {
             for dy in -1..=1 {
                 if x + dx != x || y + dy != y {
@@ -149,7 +149,7 @@ fn main() {
     b.show();
 
     loop {
-           let now = Instant::now();
+        let now = Instant::now();
         b.tick();
         // let end = time::now();
         println!("frame generated in {} us", now.elapsed().as_micros());
